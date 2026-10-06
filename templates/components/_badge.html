@@ -1,0 +1,33 @@
+<!-- Component: _badge.html (Status & Role Badges) -->
+{% with val=value|stringformat:"s"|lower %}
+    {% if val == 'new' or val == 'staff' %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+            <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-blue-500"></span>
+            {{ text|default:value|title }}
+        </span>
+    {% elif val == 'contacted' or val == 'manager' %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-indigo-500"></span>
+            {{ text|default:value|title }}
+        </span>
+    {% elif val == 'qualified' or val == 'active' or val == 'true' %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-500"></span>
+            {{ text|default:"Active"|title }}
+        </span>
+    {% elif val == 'lost' or val == 'inactive' or val == 'false' %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+            <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-rose-400"></span>
+            {% if val == 'false' or val == 'inactive' %}Inactive{% else %}{{ text|default:value|title }}{% endif %}
+        </span>
+    {% elif val == 'admin' %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+            <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-purple-500"></span>
+            {{ text|default:value|title }}
+        </span>
+    {% else %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+            {{ text|default:value|title }}
+        </span>
+    {% endif %}
+{% endwith %}

@@ -1,0 +1,49 @@
+{% load rbac_tags %}
+<tr id="lead-row-{{ lead.pk }}" class="hover:bg-slate-50/80 transition-colors">
+    <td class="px-6 py-4 whitespace-nowrap">
+        <div class="font-semibold text-slate-900">{{ lead.name }}</div>
+        <div class="text-xs text-slate-500">{{ lead.email }}</div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+        {{ lead.company_name|default:"—" }}
+        {% if lead.phone %}
+        <div class="text-xs text-slate-400">{{ lead.phone }}</div>
+        {% endif %}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+        ${{ lead.estimated_value|floatformat:2 }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+        {% include 'components/_badge.html' with value=lead.status %}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-400">
+        {{ lead.created_at|date:"M d, Y" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <div class="flex items-center justify-end space-x-2">
+            {% if request.user|can_edit %}
+            <button hx-get="{% url 'crm:lead_update' lead.pk %}" 
+                    hx-target="#modal-container" 
+                    class="rounded-lg p-1.5 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                    title="Edit Lead">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+            </button>
+            {% endif %}
+
+            {% if request.user|can_delete %}
+            <button hx-delete="{% url 'crm:lead_delete' lead.pk %}" 
+                    hx-target="#lead-row-{{ lead.pk }}" 
+                    hx-swap="outerHTML swap:400ms"
+                    hx-confirm="Are you sure you want to permanently delete '{{ lead.name }}'?"
+                    class="rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
+                    title="Delete Lead">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+            {% endif %}
+        </div>
+    </td>
+</tr>

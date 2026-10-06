@@ -1,0 +1,33 @@
+{% load rbac_tags %}
+<tr id="member-row-{{ member.pk }}" class="hover:bg-slate-50/80 transition-colors">
+    <td class="px-6 py-4 whitespace-nowrap">
+        <div class="font-semibold text-slate-900">{{ member.user.username }}</div>
+        <div class="text-xs text-slate-500">
+            {% if member.user.first_name or member.user.last_name %}
+                {{ member.user.first_name }} {{ member.user.last_name }} • 
+            {% endif %}
+            {{ member.user.email|default:"No email set" }}
+        </div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+        {% include 'components/_badge.html' with value=member.role %}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+        {{ member.phone|default:"—" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-400">
+        {{ member.created_at|date:"M d, Y" }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        {% if request.user|has_role:"admin" %}
+        <button hx-get="{% url 'user_management:team_member_edit' member.pk %}" 
+                hx-target="#modal-container" 
+                class="rounded-lg p-1.5 text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                title="Edit Member Role">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+        </button>
+        {% endif %}
+    </td>
+</tr>

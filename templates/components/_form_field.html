@@ -1,0 +1,65 @@
+<!-- Component: _form_field.html (Enterprise Tailwind Form Field with Validation) -->
+<div class="mb-4">
+    {% if field.field.widget.input_type == 'checkbox' %}
+        <!-- Checkbox Layout -->
+        <div class="flex items-center space-x-3">
+            <input type="checkbox" 
+                   name="{{ field.name }}" 
+                   id="{{ field.id_for_label }}"
+                   {% if field.value %}checked{% endif %}
+                   class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+            <label for="{{ field.id_for_label }}" class="text-sm font-medium text-slate-700 select-none">
+                {{ field.label }}
+            </label>
+        </div>
+    {% else %}
+        <!-- Standard Field Layout -->
+        <label for="{{ field.id_for_label }}" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+            {{ field.label }}
+            {% if field.field.required %}<span class="text-rose-500">*</span>{% endif %}
+        </label>
+
+        {% if field.field.widget.input_type == 'select' %}
+            <select name="{{ field.name }}" 
+                    id="{{ field.id_for_label }}"
+                    class="block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 {% if field.errors %}border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-500/20{% endif %}">
+                {% for val, text in field.field.choices %}
+                    <option value="{{ val }}" {% if field.value|stringformat:"s" == val|stringformat:"s" %}selected{% endif %}>{{ text }}</option>
+                {% endfor %}
+            </select>
+        {% elif field.field.widget.attrs.rows %}
+            <textarea name="{{ field.name }}" 
+                      id="{{ field.id_for_label }}" 
+                      rows="{{ field.field.widget.attrs.rows|default:'3' }}"
+                      class="block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 {% if field.errors %}border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-500/20{% endif %}"
+                      placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}">{{ field.value|default:'' }}</textarea>
+        {% else %}
+            <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                   name="{{ field.name }}" 
+                   id="{{ field.id_for_label }}" 
+                   value="{{ field.value|default:'' }}"
+                   placeholder="{{ field.field.widget.attrs.placeholder|default:'' }}"
+                   {% if field.field.widget.attrs.step %}step="{{ field.field.widget.attrs.step }}"{% endif %}
+                   class="block w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 {% if field.errors %}border-rose-400 bg-rose-50/20 focus:border-rose-500 focus:ring-rose-500/20{% endif %}">
+        {% endif %}
+    {% endif %}
+
+    <!-- Field Validation Errors -->
+    {% if field.errors %}
+        <div class="mt-1.5 space-y-1">
+            {% for error in field.errors %}
+                <p class="text-xs font-medium text-rose-600 flex items-center">
+                    <svg class="h-3.5 w-3.5 mr-1 inline-block shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    {{ error }}
+                </p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Help Text -->
+    {% if field.help_text %}
+        <p class="mt-1 text-xs text-slate-400">{{ field.help_text }}</p>
+    {% endif %}
+</div>

@@ -1,0 +1,28 @@
+<!-- Component: _table.html (Enterprise Data Table Wrapper) -->
+<div class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-left text-sm text-slate-600">
+            <thead class="bg-slate-50/80 text-xs uppercase tracking-wider font-semibold text-slate-500">
+                <tr>
+                    {{ thead }}
+                </tr>
+            </thead>
+            <tbody id="{{ tbody_id|default:'table-body' }}" class="divide-y divide-slate-100 bg-white">
+                {{ tbody }}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    {% if is_empty %}
+    <div class="py-16 text-center">
+        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+        </div>
+        <h3 class="mt-3 text-sm font-semibold text-slate-900">{{ empty_title|default:"No records found" }}</h3>
+        <p class="mt-1 text-xs text-slate-500">{{ empty_description|default:"Get started by creating a new entry above." }}</p>
+    </div>
+    {% endif %}
+</div>

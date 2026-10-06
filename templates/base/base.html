@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ request.tenant.name }} | Multi-Tenant Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTMX CDN -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        .htmx-indicator { display: none; }
+        .htmx-request .htmx-indicator { display: inline-flex; }
+        .htmx-request.htmx-indicator { display: inline-flex; }
+        tr.htmx-swapping { opacity: 0; transform: translateX(20px); transition: all 400ms ease-out; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-indigo-900 text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+            <div class="flex items-center space-x-3">
+                <span class="font-bold text-xl tracking-tight">{{ request.tenant.name }}</span>
+                <span class="text-xs bg-indigo-700 px-2.5 py-1 rounded-full text-indigo-200 font-mono">
+                    Schema: {{ request.tenant.schema_name }}
+                </span>
+            </div>
+
+            <!-- Dynamic Module Navigation Links based on active_modules -->
+            <div class="flex items-center space-x-3">
+                <a href="/" class="hover:bg-indigo-800 px-3 py-2 rounded-lg text-sm font-medium transition">Dashboard</a>
+
+                {% if "user_management" in request.tenant.active_modules %}
+                    <a href="/users/" class="hover:bg-indigo-800 px-3 py-2 rounded-lg text-sm font-medium transition">Team</a>
+                {% endif %}
+
+                {% if "crm" in request.tenant.active_modules %}
+                    <a href="/crm/" class="hover:bg-indigo-800 px-3 py-2 rounded-lg text-sm font-medium transition">CRM Leads</a>
+                {% endif %}
+
+                {% if "hrm" in request.tenant.active_modules %}
+                    <a href="/hrm/" class="hover:bg-indigo-800 px-3 py-2 rounded-lg text-sm font-medium transition">HRM Employees</a>
+                {% endif %}
+
+                <!-- User Role Indicator & Admin Link -->
+                <div class="flex items-center pl-3 border-l border-indigo-700/60 space-x-2">
+                    {% if request.user.is_authenticated %}
+                        <span class="text-xs bg-indigo-950/70 border border-indigo-700/60 text-indigo-200 px-2 py-1 rounded-lg">
+                            {{ request.user.tenant_profile.role|default:"staff"|title }}
+                        </span>
+                    {% endif %}
+                    <a href="/admin/" class="text-indigo-200 hover:text-white text-xs border border-indigo-700 px-2.5 py-1 rounded-lg hover:border-indigo-500 transition">Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Canvas -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Global Modal Dialog Container for HTMX -->
+    <div id="modal-container"></div>
+
+    <!-- Global Toast Notifications Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <script>
+        // Listen to HTMX trigger event to close modal dialog
+        document.body.addEventListener('closeModal', function() {
+            const modal = document.getElementById('modal-container');
+            if (modal) modal.innerHTML = '';
+        });
+
+        // Listen to HTMX toast notifications
+        document.body.addEventListener('showToast', function(e) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const msg = (typeof e.detail === 'object' && e.detail.value) ? e.detail.value : (e.detail || "Operation successful");
+            const toast = document.createElement('div');
+            toast.className = 'pointer-events-auto flex items-center bg-slate-900 text-white text-sm px-4 py-3 rounded-xl shadow-xl border border-slate-700 transition transform duration-300 translate-y-2 opacity-0';
+            toast.innerHTML = `
+                <svg class="h-4 w-4 mr-2 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>${msg}</span>
+            `;
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            // Auto-dismiss after 3.5s
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                const modal = document.getElementById('modal-container');
+                if (modal) modal.innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>
